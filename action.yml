@@ -1,0 +1,45 @@
+name: action-codeartifact-login
+description: https://github.com/champtitles/action-codeartifact-login
+inputs:
+  aws_region:
+    description: 'AWS Region'
+    required: false
+    default: 'us-east-2'
+  domain_owner:
+    description: 'AWS CodeArtifact Domain Owner'
+    required: true
+  domain:
+    description: 'AWS CodeArtifact Domain'
+    required: true
+  maven_repo_id:
+    description: 'AWS CodeArtifact Maven Repo'
+    required: true
+  maven_repo_url:
+    description: 'AWS CodeArtifact Maven URL'
+    required: true
+  npm_repo_url:
+    description: 'AWS CodeArtifact npm URL'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      env:
+        AWS_REGION: ${{ inputs.aws_region }}
+        DOMAIN_OWNER: ${{ inputs.domain_owner }}
+        DOMAIN: ${{ inputs.domain }}
+        MAVEN_REPO_ID: ${{ inputs.maven_repo_id }}
+        MAVEN_REPO_URL: ${{ inputs.maven_repo_url }}
+      run: |
+        set -e
+        echo "Getting AWS CodeArtifact token..."
+        token=$(aws codeartifact get-authorization-token --region $AWS_REGION --domain $DOMAIN --domain-owner $DOMAIN_OWNER --query authorizationToken --output text)
+        export CODEARTIFACT_AUTH_TOKEN=$token
+
+        echo "Updating Maven settings.xml for CodeArtifact"
+        python3 maven_settings_codeartifact.py
+
+        echo "Updating npm settings for CodeArtifact"
+        npm config set registry=https://${{ inputs.npm_repo_url }}
+        npm config set //${{ inputs.npm_repo_url }}:_authToken=${CODEARTIFACT_AUTH_TOKEN}
+        npm config set //${{ inputs.npm_repo_url }}:always-auth=true
