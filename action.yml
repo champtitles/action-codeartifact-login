@@ -60,6 +60,11 @@ runs:
         echo $url
         export NPM_REPO_URL=$url
 
+        echo "Updating yarn settings for CodeArtifact"
+        yarn config set npmRegistryServer registry=$NPM_REPO_URL
+        yarn config set 'npmRegistries["$NPM_REPO_URL"].npmAuthToken' "${CODEARTIFACT_AUTH_TOKEN}"
+        yarn config set 'npmRegistries["$NPM_REPO_URL"].npmAlwaysAuth' "true"; }
+
         echo "Updating npm settings for CodeArtifact"
         npm config set registry=$NPM_REPO_URL
         NPM_REPO_URL=$(echo $NPM_REPO_URL | awk '{ print substr ($0, 9 ) }') # Remove "https://" from beginning of URL
