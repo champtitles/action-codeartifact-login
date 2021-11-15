@@ -52,6 +52,7 @@ runs:
         export MAVEN_REPO_URL=$url
 
         echo "Updating Maven settings.xml for CodeArtifact"
+        mkdir -p ~/.m2/
         envsubst < ${GITHUB_ACTION_PATH}/settings.xml > ~/.m2/settings.xml
 
         echo "Getting AWS CodeArtifact npm endpoint url..."
