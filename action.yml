@@ -54,6 +54,9 @@ runs:
         echo "Updating Maven settings.xml for CodeArtifact"
         mkdir -p ~/.m2/
         envsubst < ${GITHUB_ACTION_PATH}/settings.xml > ~/.m2/settings.xml
+ 
+        echo "Updating npm settings for CodeArtifact"
+        aws codeartifact login --tool npm --repository npm --domain $DOMAIN --region $AWS_REGION
 
         echo "Getting AWS CodeArtifact npm endpoint url..."
         url=$(aws codeartifact get-repository-endpoint --region $AWS_REGION --domain $DOMAIN --repository $NPM_REPO_NAME --format npm --query repositoryEndpoint --output text)
@@ -61,12 +64,7 @@ runs:
         export NPM_REPO_URL=$url
 
         echo "Updating yarn settings for CodeArtifact"
-        yarn config set npmRegistryServer registry=$NPM_REPO_URL
-        yarn config set npmRegistries["$NPM_REPO_URL"].npmAuthToken "${CODEARTIFACT_AUTH_TOKEN}"
-        yarn config set npmRegistries["$NPM_REPO_URL"].npmAlwaysAuth "true";
+        yarn config set npmRegistryServer $NPM_REPO_URL
+        yarn config set 'npmRegistries["'$NPM_REPO_URL'"].npmAuthToken' "${CODEARTIFACT_AUTH_TOKEN}"
+        yarn config set 'npmRegistries["'$NPM_REPO_URL'"].npmAlwaysAuth' "true"
 
-        echo "Updating npm settings for CodeArtifact"
-        npm config set registry=$NPM_REPO_URL
-        NPM_REPO_URL=$(echo $NPM_REPO_URL | awk '{ print substr ($0, 9 ) }') # Remove "https://" from beginning of URL
-        npm config set //$NPM_REPO_URL:_authToken=${CODEARTIFACT_AUTH_TOKEN}
-        npm config set //$NPM_REPO_URL:always-auth=true
