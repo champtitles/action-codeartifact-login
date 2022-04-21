@@ -57,6 +57,7 @@ runs:
  
         echo "Updating npm settings for CodeArtifact"
         aws codeartifact login --tool npm --repository npm --domain $DOMAIN --region $AWS_REGION
+        npm config set always-auth true
 
         echo "Getting AWS CodeArtifact npm endpoint url..."
         url=$(aws codeartifact get-repository-endpoint --region $AWS_REGION --domain $DOMAIN --repository $NPM_REPO_NAME --format npm --query repositoryEndpoint --output text)
