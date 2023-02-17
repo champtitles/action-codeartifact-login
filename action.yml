@@ -57,7 +57,6 @@ runs:
  
         echo "Updating npm settings for CodeArtifact"
         aws codeartifact login --tool npm --repository npm --domain $DOMAIN --region $AWS_REGION
-        npm config set always-auth true | true
 
         echo "Getting AWS CodeArtifact npm endpoint url..."
         url=$(aws codeartifact get-repository-endpoint --region $AWS_REGION --domain $DOMAIN --repository $NPM_REPO_NAME --format npm --query repositoryEndpoint --output text)
@@ -67,5 +66,4 @@ runs:
         echo "Updating yarn settings for CodeArtifact"
         yarn config set npmRegistryServer $NPM_REPO_URL
         yarn config set 'npmRegistries["'$NPM_REPO_URL'"].npmAuthToken' "${CODEARTIFACT_AUTH_TOKEN}"
-        yarn config set 'npmRegistries["'$NPM_REPO_URL'"].npmAlwaysAuth' "true" | true
 
