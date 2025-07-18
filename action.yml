@@ -66,4 +66,4 @@ runs:
         echo "Updating yarn settings for CodeArtifact"
         yarn config set npmRegistryServer $NPM_REPO_URL
         yarn config set 'npmRegistries["'$NPM_REPO_URL'"].npmAuthToken' "${CODEARTIFACT_AUTH_TOKEN}"
-
+        yarn config set 'npmRegistries["'$NPM_REPO_URL'"].npmAlwaysAuth' "true"
